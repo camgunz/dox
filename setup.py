@@ -11,6 +11,6 @@ setup(
         if line and not line.startswith('-')
     ],
     entry_points={
-        'pygments.lexers': 'SylvaLexer = dox:sylva_lexer.py'
+        'pygments.lexers': 'SylvaLexer = dox:SylvaLexer'
     }
 )

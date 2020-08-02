@@ -9,7 +9,7 @@
     :license: BSD, see LICENSE for details.
 """
 
-from pygments.lexer import RegexLexer, include, bygroups, words
+from pygments.lexer import RegexLexer, bygroups, words
 from pygments.token import (
     Text, Comment, Operator, Keyword, Name, String, Number, Punctuation,
     Whitespace
@@ -17,6 +17,23 @@ from pygments.token import (
 
 __all__ = ['SylvaLexer']
 
+
+NUM_REGEX = (
+    r'[+-]?'
+    r'(('
+    r'('
+    r'(((\d+\.\d+)|(\d+\.)|(\.\d+))([Ee][+-]?\d+)?)|'
+    r'(\d+[Ee][+-]?\d+)'
+    r')'
+    r'(f(16|32|64|128|256))?'
+    r'(ra|rd|ru|rz)?'
+    r')|'
+    r'('
+    r'\d+'
+    r'([iu](8|16|32|64|128|256)?)?'
+    r'[cw]?'
+    r'))'
+)
 
 class SylvaLexer(RegexLexer):
     """
@@ -26,7 +43,7 @@ class SylvaLexer(RegexLexer):
     """
     name = 'Sylva'
     filenames = ['*.sy']
-    aliases = ['sy']
+    aliases = ['sy', 'sylva']
     mimetypes = ['text/sy']
 
     tokens = {
@@ -37,15 +54,15 @@ class SylvaLexer(RegexLexer):
             (r'#(.*)(\r\n|\r|\n)', Comment.Single),
 
             # Importing
-            (r'(requirement)((?:\s|\\\s)+)', bygroups(Keyword.Namespace, Text),
-             'requirement'),
+            (r'(requirement)((?:\s|\\\s)+)', bygroups(Keyword.Namespace, Text)),
 
             # Keywords
             (r'(var)\b', Keyword.Declaration),
             (words((
-                'alias', 'break', 'continue', 'else', 'enum', 'exit', 'fn',
-                'fntype', 'if', 'implementation', 'interface', 'loop', 'match',
-                'range', 'return', 'struct', 'switch', 'while'
+                'alias', 'break', 'case', 'continue', 'echoexit', 'else',
+                'enum', 'exit', 'fn', 'fntype', 'if', 'implementation',
+                'interface', 'loop', 'match', 'range', 'return', 'struct',
+                'switch'
             ), suffix=r'\b'),
              Keyword),
             (r'module\b', Keyword.Namespace),
@@ -65,38 +82,28 @@ class SylvaLexer(RegexLexer):
              r"""|\\u\{[0-9a-fA-F]{1,6}\}|.)'""",
              String.Char),
 
-            # Float Literal
-            (r'^[+-]??\d+\.\d+([Ee][+-]??\d+)?\d+\.([Ee][+-]??\d+)?\d+'
-             r'[Ee][+-]??\d+\.\d+([Ee][+-]??\d+)?f\d+(ru|rd|rz|ra)?',
-             Number.Float),
-
-            # Decimal Literal
-            (r'^[+-]??\d+\.\d+([Ee][+-]??\d+)?\d+\.([Ee][+-]??\d+)?\d+'
-             r'[Ee][+-]??\d+\.\d+([Ee][+-]??\d+)?(ru|rd|rz|ra)?',
-             Number.Float),
+            # Numeric Literals
+            (NUM_REGEX, Number.Integer),
+            (NUM_REGEX, Number.Float),
 
             # Binary Integer Literal
-            (r'0[bB][01_]+[su](8|16|32|64|128|256)', Number.Bin),
+            (r'0[bB][01_]+[iu](8|16|32|64|128|256)', Number.Bin),
 
             # Octal Integer Literal
-            (r'0[oO][0-7_]+[su](8|16|32|64|128|256)', Number.Oct),
+            (r'0[oO][0-7_]+[iu](8|16|32|64|128|256)', Number.Oct),
 
             # Hexadecimal Integer Literal
-            (r'0[xX][0-9a-fA-F_]+[su](8|16|32|64|128|256)', Number.Hex),
-
-            # Decimal Integer Literal
-            (r'[+-]??\d+(i|u)\d+(w|c)?', Number.Integer),
+            (r'0[xX][0-9a-fA-F_]+[iu](8|16|32|64|128|256)', Number.Hex),
 
             # String Literal
-            (r'"(.*?)"', String, 'string'),
+            (r'"(.*?)"', String),
 
             # Operators and Punctuation
             (r'[{}()\[\]:,.]', Punctuation),
             (r'[+\-*/%&|<>^!~=]', Operator),
 
             # Identifier
-            (r"^[\@]*\w+", Name),
-            include('meta')
+            (r'[\@]*\w+', Name),
         ],
         'string': [
             (r'"', String, '#pop'),

@@ -3,6 +3,7 @@ import os.path
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
+from pygments.util import ClassNotFound as LexerNotFound
 
 import commonmark
 
@@ -17,17 +18,14 @@ class Renderer:
 
     def highlight_codeblocks(self, ast):
         for node, start in ast.walker():
-            if not (start and node.t == 'CodeBlock' and node.string_content):
+            if not (start and node.t == 'code_block' and node.literal):
                 continue
-            lexer = get_lexer_by_name(node.info)
-            if not lexer:
+            try:
+                lexer = get_lexer_by_name(node.info)
+            except LexerNotFound:
                 print(f'No lexer for language "{node.info}"')
                 continue
-            node.string_content = highlight(
-                node.string_content,
-                lexer,
-                self.formatter
-            )
+            node.literal = highlight(node.literal, lexer, self.formatter)
 
     def render(self, markdown_source):
         ast = self.parser.parse(markdown_source)
@@ -48,7 +46,7 @@ class Renderer:
             out_fobj.write(self.resources.footer)
 
     def render_all(self):
-        map(self.render_file, filter(
+        list(map(self.render_file, filter(
             lambda sf: sf.endswith('.md'),
             os.listdir(self.folders.src_dir)
-        ))
+        )))
