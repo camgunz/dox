@@ -18,7 +18,8 @@ class Renderer:
 
     def highlight_codeblocks(self, ast):
         for node, start in ast.walker():
-            if not (start and node.t == 'code_block' and node.literal):
+            if not (start and node.t == 'code_block' and node.literal
+                    and node.info):
                 continue
             try:
                 lexer = get_lexer_by_name(node.info)
