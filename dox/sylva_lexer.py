@@ -20,19 +20,23 @@ __all__ = ['SylvaLexer']
 
 NUM_REGEX = (
     r'[+-]?'
-    r'(('
     r'('
-    r'(((\d+\.\d+)|(\d+\.)|(\.\d+))([Ee][+-]?\d+)?)|'
-    r'(\d+[Ee][+-]?\d+)'
+    r'('
+      r'(\d+)'
+      r'(([iu])(8|16|32|64|128|256))'
+      r'([cw])?'
     r')'
-    r'(f(16|32|64|128|256))?'
-    r'(ra|rd|ru|rz)?'
-    r')|'
+    r'|'
     r'('
-    r'\d+'
-    r'([iu](8|16|32|64|128|256)?)?'
-    r'[cw]?'
-    r'))'
+      r'('
+        r'(((\d+\.\d+)|(\d+\.)|(\.\d+))([Ee][+-]?\d+)?)|'
+        r'(\d+[Ee][+-]?\d+)|'
+        r'(\d+)'
+      r')'
+      r'(f(16|32|64|128|256))?'
+      r'(ra|rd|ru|rz)?'
+    r')'
+    r')'
 )
 
 class SylvaLexer(RegexLexer):
@@ -59,21 +63,38 @@ class SylvaLexer(RegexLexer):
             # Keywords
             (r'(var)\b', Keyword.Declaration),
             (words((
-                'alias', 'break', 'case', 'continue', 'echoexit', 'else',
-                'enum', 'exit', 'fn', 'fntype', 'if', 'implementation',
+                'alias', 'break', 'case', 'continue', 'default', 'else',
+                'enum', 'exit', 'for', 'fn', 'fntype', 'if', 'implementation',
                 'interface', 'loop', 'match', 'range', 'return', 'struct',
-                'switch'
+                'switch', 'while'
             ), suffix=r'\b'),
              Keyword),
             (r'module\b', Keyword.Namespace),
             (r'(true|false)\b', Keyword.Constant),
             (words((
-                'bool', 'rune', 'num', 'integer', 'int', 'i8', 'i16', 'i32',
-                'i64', 'i128', 'i256', 'uint', 'u8', 'u16', 'u32', 'u64',
-                'u128', 'u256', 'float', 'f16', 'f32', 'f64', 'f128', 'f256',
-                'complex', 'c16', 'c32', 'c64', 'c128', 'c256', 'dec', 'str',
-                'array', 'struct', 'variant', 'fn', 'fntype', 'range', 'enum',
-                'cfn', 'cfntype', 'cptr', 'cstr', 'cstruct', 'cunion', 'cvoid'
+                'bool',
+                'rune',
+                'num',
+                'integer', 'int', 'i8', 'i16', 'i32', 'i64', 'i128', 'i256',
+                'uint', 'u8', 'u16', 'u32', 'u64', 'u128', 'u256',
+                'float', 'f16', 'f32', 'f64', 'f128', 'f256',
+                'complex', 'c16', 'c32', 'c64', 'c128', 'c256',
+                'dec',
+                'str',
+                'array',
+                'struct',
+                'variant',
+                'fn',
+                'fntype',
+                'range',
+                'enum',
+                'cfn',
+                'cfntype',
+                'cptr',
+                'cstr',
+                'cstruct',
+                'cunion',
+                'cvoid'
             ), suffix=r'\b'),
              Keyword.Type),
 

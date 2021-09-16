@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import shutil
 import sys
 
@@ -13,16 +14,21 @@ def main():
         ))
         sys.exit(-1)
 
-    if len(sys.argv) != 2:
-        print("Usage: dox [root folder]", file=sys.stderr)
-        sys.exit(-1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        'working_folder', type=str, help='Path to working folder'
+    )
 
-    folders = dox.Folders(sys.argv[1])
+    args = parser.parse_args()
+
+    folders = dox.Folders(args.working_folder)
 
     folders.clear_doc_dir()
     folders.create_all()
+
     resources = dox.Resources(folders)
     resources.install()
+
     renderer = dox.Renderer(folders, resources)
     renderer.render_all()
 
